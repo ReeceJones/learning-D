@@ -63,45 +63,172 @@ void foo6()
   writefln("hello from foo6");
 }
 
-//aliases are like #define statements in c++
+//aliases are like #define and typedef statements in c++
 alias fooalias = foo6;
+
+//in D you can have auto-deducing templates that do not have to be explicitly defined
+void foo7(T)(T bar)
+{
+  writeln(bar);
+}
+
+//you can also have explicitly defined templates to reduce possible errors
+template Bar(T)
+{
+  void foo8(T bar)
+  {
+    writeln(bar);
+  }
+}
+
+//like in c++ templates can also be used not just to define types, but also to define values
+template Foo(string mode)
+{
+  void foo9()
+  {
+    if (mode == "hello")
+    {
+      writeln("Hello World");
+    }
+    else if (mode == "template")
+    {
+      writeln("this is from a template");
+    }
+  }
+}
+
+class FooClass
+{
+private:
+  int x, y;
+public:
+  this()
+  {
+    x = 0;
+    y = 1;
+  }
+  void change()
+  {
+    int tmp = x;
+    x = y;
+    y = tmp;
+  }
+  int[] getContents()
+  {
+    return [x,y];
+  }
+  //for foo11
+  //unfortunately operator overloading in D is a bit wierd
+  //the overloads require less writing, but are just wierd
+  //to override the == and != operator you have to overload the function
+  //opEquals.
+  override bool opEquals(Object f)
+  {
+    if (this is f)
+      return true;
+    if (this is null || f is null)
+      return false;
+    if (typeid(this) == typeid(f))
+      return this.x == (cast(FooClass)f).x && this.y == (cast(FooClass)f).y;
+    return false;
+  }
+}
+
+
+// bool opEquals(FooClass f, FooClass b)
+// {
+//    return b.x == f.x && b.y == f.y;
+// //  return true;
+// }
+
+//in D you can easily externally add methods to a class
+//parameter just has to be the class, followed by rest of parameters
+void foo10(FooClass f, int x, int y)
+{
+  f.x = x;
+  f.y = y;
+}
 
 int main(string[] args)
 {
-  if (args[1] == "-f0")
+  if (args.length > 1)
   {
-    int somenumber = 0;
-    writeln("foo0 return value: ", foo0(somenumber));
-    writeln("somenmuber: ", somenumber);
+    if (args[1] == "-f0")
+    {
+      int somenumber = 0;
+      writeln("foo0 return value: ", foo0(somenumber));
+      writeln("somenmuber: ", somenumber);
+    }
+    else if (args[1] == "-f1")
+    {
+      int somenumber = 0;
+      writeln("foo1 return value: ", foo1(somenumber));
+      writeln("somenumber: ", somenumber);
+    }
+    else if (args[1] == "-f2")
+    {
+      int somenumber = 0;
+      writeln("foo2 return value: ", foo2(somenumber, bar2(99)));
+      writeln("somenumber: ", somenumber);
+    }
+      else if (args[1] == "-f3")
+    {
+      writeln(foo3(1, 5));
+    }
+    else if (args[1] == "-f4")
+    {
+      writeln(foo4([1,2,3,4,5,6,7,8,9,0]));
+    }
+    else if (args[1] == "-f5")
+    {
+      string s = "this is a string.";
+      writeln(foo5(s));
+    }
+    else if (args[1] == "-f6")
+    {
+      fooalias();
+    }
+    else if (args[1] == "-f7")
+    {
+      foo7("this is a string");
+      foo7(5);
+    }
+    else if (args[1] == "-f8")
+    {
+      Bar!(string).foo8("hello from foo8");
+    }
+    else if (args[1] == "-f9")
+    {
+      Foo!"hello".foo9();
+      Foo!"template".foo9();
+    }
+    else if (args[1] == "-f10")
+    {
+      //in D unique objects are not pointers. They are similar to objects in java where you use '.'
+      //instead of '->' to access the members of the object
+      FooClass f = new FooClass();
+      writeln(f.getContents());
+      //by adding the function to the end of the object name, you are essentially doing foo10(f, 50, 100);
+      //which is the same as f.foo10(50, 100);
+      f.foo10(50, 100);
+      writeln(f.getContents());
+    }
+    else if (args[1] == "-f11")
+    {
+      FooClass f = new FooClass();
+      FooClass b = new FooClass();
+      writeln("foo: ", f.getContents());
+      writeln("bar: ", b.getContents());
+      writeln(f == b);
+      f.foo10(100, 100);
+      writeln("foo: ", f.getContents());
+      writeln("bar: ", b.getContents());
+      writeln(f == b);
+    }
   }
-  else if (args[1] == "-f1")
+  else
   {
-    int somenumber = 0;
-    writeln("foo1 return value: ", foo1(somenumber));
-    writeln("somenumber: ", somenumber);
-  }
-  else if (args[1] == "-f2")
-  {
-    int somenumber = 0;
-    writeln("foo2 return value: ", foo2(somenumber, bar2(99)));
-    writeln("somenumber: ", somenumber);
-  }
-  else if (args[1] == "-f3")
-  {
-    writeln(foo3(1, 5));
-  }
-  else if (args[1] == "-f4")
-  {
-    writeln(foo4([1,2,3,4,5,6,7,8,9,0]));
-  }
-  else if (args[1] == "-f5")
-  {
-    string s = "this is a string.";
-    writeln(foo5(s));
-  }
-  else if (args[1] == "-f6")
-  {
-    fooalias();
+    writeln("use -f0..-f11");
   }
   return 0;
 }
