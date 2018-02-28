@@ -122,6 +122,8 @@ public:
   //the overloads require less writing, but are just wierd
   //to override the == and != operator you have to overload the function
   //opEquals.
+  //the general structure for opEquals is checking for same type, checking for null,
+  //checking the condition, and then returning this.opEquals and other.opEquals
   override bool opEquals(Object f)
   {
     if (this is f)
@@ -130,7 +132,7 @@ public:
       return false;
     if (typeid(this) == typeid(f))
       return this.x == (cast(FooClass)f).x && this.y == (cast(FooClass)f).y;
-    return false;
+    return this.opEquals(f) && f.opEquals(this);
   }
 }
 
