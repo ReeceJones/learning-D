@@ -176,6 +176,16 @@ void foo13(T...)(T t)
     writeln(p);
 }
 
+void foo14()
+{
+  import core.cpuid: processor;
+  import std.digest.sha;
+  //in D there are some usefull and not so usefull but cool libraries
+  writeln(processor());
+  //you can even compute the sha of data
+  writeln("sha256 of \"abc\": ", toHexString(sha256Of("abc")));
+}
+
 int main(string[] args)
 {
   if (args.length > 1)
@@ -251,6 +261,9 @@ int main(string[] args)
       writeln("foo: ", f.getContents());
       writeln("bar: ", b.getContents());
       writeln(f == b);
+      //you can check for nullptrs using is null
+      f = null;
+      writeln(f is null);
     }
     else if (args[1] == "-f12")
     {
@@ -259,6 +272,10 @@ int main(string[] args)
     else if (args[1] == "-f13")
     {
       foo13("this is a string", 2, [1, 10]);
+    }
+    else if (args[1] == "-f14")
+    {
+      foo14();
     }
   }
   else
