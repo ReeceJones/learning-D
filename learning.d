@@ -151,6 +151,31 @@ void foo10(FooClass f, int x, int y)
   f.y = y;
 }
 
+void foo12()
+{
+    import std.datetime.stopwatch:StopWatch;
+    import core.thread: Thread;
+    import std.file: write, read;
+    StopWatch sw;
+    sw.start();
+    write("foo.txt", "this is a string");
+    sw.stop();
+    writeln("wrote foo.txt in ", sw.peek().total!"msecs", "ms");
+    sw.reset();
+    sw.start();
+    string s = cast(string)read("foo.txt");
+    sw.stop();
+    writeln("foo.txt: ", s);
+    writeln("read foo.txt in ", sw.peek().total!"msecs", "ms");
+}
+
+//variadic functions in D can be very easy!
+void foo13(T...)(T t)
+{
+  foreach(p; t)
+    writeln(p);
+}
+
 int main(string[] args)
 {
   if (args.length > 1)
@@ -227,10 +252,18 @@ int main(string[] args)
       writeln("bar: ", b.getContents());
       writeln(f == b);
     }
+    else if (args[1] == "-f12")
+    {
+      foo12();
+    }
+    else if (args[1] == "-f13")
+    {
+      foo13("this is a string", 2, [1, 10]);
+    }
   }
   else
   {
-    writeln("use -f0..-f11");
+    writeln("use -f0..-f13");
   }
   return 0;
 }
